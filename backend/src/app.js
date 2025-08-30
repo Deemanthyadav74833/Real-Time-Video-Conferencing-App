@@ -26,10 +26,7 @@ app.use("/api/v1/users", userRoutes);
 
 const start = async () => {
     try {
-        const connectionDb = await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        const connectionDb = await mongoose.connect(process.env.MONGO_URI);
         console.log(`✅ Database connected to ${connectionDb.connection.host}`);
 
         server.listen(app.get("port"), () => {
