@@ -1,95 +1,109 @@
-import { createContext } from 'react';
-import { useContext } from 'react';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { StatusCodes } from "http-status-codes";
 
 export const AuthContext = createContext({});
 
+// ✅ Auto-pick backend URL (localhost if dev, Render if deployed)
 const client = axios.create({
-    baseURL: "http://localhost:8000/api/v1/users",
-})
-
-
+  baseURL:
+    window.location.hostname === "localhost"
+      ? "http://localhost:8000/api/v1/users"
+      : "https://real-time-video-conferencing-app-vd32.onrender.com/api/v1/users",
+});
 
 export const AuthProvider = ({ children }) => {
-    const authContext = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const [userData, setUserData] = useState(authContext);
+  const navigate = useNavigate();
 
-    const [userData, setUserData] = useState(authContext);
+  // ----------------- REGISTER -----------------
+  const handleRegister = async (name, username, password) => {
+    try {
+      let request = await client.post("/register", {
+        name,
+        username,
+        password,
+      });
 
-    const handleRegister = async (name,username,password) => {
-        try{
-            let request = await client.post('/register', {
-                name: name,
-                username: username,
-                password: password,
-            });
-
-            if(request.status === StatusCodes.CREATED){
-                return request.data.message;
-            }
-
-        } catch (error) {
-            throw error;
-        }
+      if (request.status === StatusCodes.CREATED) {
+        return request.data.message;
+      }
+    } catch (error) {
+      console.error("Register Error:", error.response?.data || error.message);
+      throw error;
     }
+  };
 
+  // ----------------- LOGIN -----------------
+  const handleLogin = async (username, password) => {
+    try {
+      let request = await client.post("/login", {
+        username,
+        password,
+      });
 
-    
-    const handleLogin = async (username, password) => {
-        try {
-            let request = await client.post("/login", {
-                username: username,
-                password: password
-            });
+      console.log("Login Response:", request.data);
 
-            console.log(username, password)
-            console.log(request.data)
-
-            if (request.status === StatusCodes.OK) {
-                localStorage.setItem("token", request.data.token);
-            }
-        } catch (err) {
-            throw err;
-        }
+      if (request.status === StatusCodes.OK) {
+        localStorage.setItem("token", request.data.token);
+        setUserData(request.data.user);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Login Error:", error.response?.data || error.message);
+      throw error;
     }
+  };
 
-    const getHistoryOfUser = async () => {
-        try {
-            let request = await client.get("/allactivity",{
-                params: {
-                    token: localStorage.getItem("token")
-                }
+  // ----------------- GET HISTORY -----------------
+  const getHistoryOfUser = async () => {
+    try {
+      let request = await client.get("/allactivity", {
+        params: {
+          token: localStorage.getItem("token"),
+        },
+      });
 
-            });
-            return request.data;
-        } catch (error) {
-            throw error;
-        }
+      return request.data;
+    } catch (error) {
+      console.error("History Error:", error.response?.data || error.message);
+      throw error;
     }
+  };
 
-    const addToUserHistory = async (meetingcode) => {
-        try {
-            let request = await client.post("/addToActivity", {
-                token: localStorage.getItem("token"),
-                meeting_code: meetingcode
-            });
+  // ----------------- ADD TO HISTORY -----------------
+  const addToUserHistory = async (meetingcode) => {
+    try {
+      let request = await client.post("/addToActivity", {
+        token: localStorage.getItem("token"),
+        meeting_code: meetingcode,
+      });
 
-            return request;
-        } catch (error) {
-            throw error;
-        }
+      return request.data;
+    } catch (error) {
+      console.error("AddToHistory Error:", error.response?.data || error.message);
+      throw error;
     }
+  };
 
-    const data = {
-        userData, setUserData, handleRegister, handleLogin, getHistoryOfUser,addToUserHistory
-    }
+  // ----------------- LOGOUT -----------------
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUserData(null);
+    navigate("/login");
+  };
 
-    return(
-       <AuthContext.Provider value={data} >
-            {children}
-       </AuthContext.Provider>
-    )
-}
+  const data = {
+    userData,
+    setUserData,
+    handleRegister,
+    handleLogin,
+    getHistoryOfUser,
+    addToUserHistory,
+    handleLogout,
+  };
+
+  return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
+};
