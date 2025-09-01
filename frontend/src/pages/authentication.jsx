@@ -31,31 +31,33 @@ export default function Authentication() {
 
   const router = useNavigate();
 
-  let handleAuth = async () => {
-    try {
-      if (formState === 0) {
-        let result = await handleLogin(username, password);
-        setMessage("Login successful!"); 
-        setOpen(true);
-        router("/home");
-      }
-      if (formState === 1) {
-        let result = await handleRegister(name, username, password);
-        console.log(result);
-        setUsername("");
-        setMessage("Registration successful!");  
-        setOpen(true);
-        setError("");
-        setFormState(0);
-        setPassword("");
-        router("/auth");
-      }
-    } catch (err) {
-      console.log(err);
-      let message = (err.response.data.message);
-      setError(message);
+let handleAuth = async () => {
+  try {
+    if (formState === 0) {
+      let result = await handleLogin(username, password);
+      console.log("Login result:", result); // 🔍 Debug
+      setMessage("Login successful!");
+      setOpen(true);
+      router("/home"); // make sure you have this route
     }
+
+    if (formState === 1) {
+      let result = await handleRegister(name, username, password);
+      console.log("Register result:", result); // 🔍 Debug
+      setUsername("");
+      setMessage("Registration successful!");
+      setOpen(true);
+      setError("");
+      setFormState(0);
+      setPassword("");
+      router("/auth");
+    }
+  } catch (err) {
+    console.error("Auth error:", err.response?.data || err.message || err);
+    setError(err.response?.data?.message || "Something went wrong");
   }
+};
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
