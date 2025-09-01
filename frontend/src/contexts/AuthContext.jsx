@@ -1,11 +1,12 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { StatusCodes } from "http-status-codes";
 
+// ----------------- CREATE CONTEXT -----------------
 export const AuthContext = createContext({});
 
-// ✅ Auto-pick backend URL (localhost if dev, Render if deployed)
+// ----------------- SETUP AXIOS CLIENT -----------------
 const client = axios.create({
   baseURL:
     window.location.hostname === "localhost"
@@ -13,22 +14,22 @@ const client = axios.create({
       : "https://real-time-video-conferencing-app-vd32.onrender.com/api/v1/users",
 });
 
+// ----------------- AUTH PROVIDER -----------------
 export const AuthProvider = ({ children }) => {
-  const authContext = useContext(AuthContext);
-  const [userData, setUserData] = useState(authContext);
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
   // ----------------- REGISTER -----------------
   const handleRegister = async (name, username, password) => {
     try {
-      let request = await client.post("/register", {
+      const response = await client.post("/register", {
         name,
         username,
         password,
       });
 
-      if (request.status === StatusCodes.CREATED) {
-        return request.data.message;
+      if (response?.status === StatusCodes.CREATED) {
+        return response.data.message;
       }
     } catch (error) {
       console.error("Register Error:", error.response?.data || error.message);
@@ -39,20 +40,16 @@ export const AuthProvider = ({ children }) => {
   // ----------------- LOGIN -----------------
   const handleLogin = async (username, password) => {
     try {
-      let request = await client.post("/login", {
-        username,
-        password,
-      });
+      const response = await client.post("/login", { username, password });
 
-      console.log("Login Response:", request.data);
-
-      if (request.status === StatusCodes.OK) {
-        localStorage.setItem("token", request.data.token);
-        setUserData(request.data.user);
+      if (response?.status === StatusCodes.OK && response?.data) {
+        localStorage.setItem("token", response.data.token);
+        setUserData(response.data.user);
         navigate("/dashboard");
       }
     } catch (error) {
       console.error("Login Error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Login failed");
       throw error;
     }
   };
@@ -60,31 +57,36 @@ export const AuthProvider = ({ children }) => {
   // ----------------- GET HISTORY -----------------
   const getHistoryOfUser = async () => {
     try {
-      let request = await client.get("/allactivity", {
-        params: {
-          token: localStorage.getItem("token"),
+      const response = await client.get("/allactivity", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      return request.data;
+      return response?.data || [];
     } catch (error) {
       console.error("History Error:", error.response?.data || error.message);
-      throw error;
+      return [];
     }
   };
 
   // ----------------- ADD TO HISTORY -----------------
   const addToUserHistory = async (meetingcode) => {
     try {
-      let request = await client.post("/addToActivity", {
-        token: localStorage.getItem("token"),
-        meeting_code: meetingcode,
-      });
+      const response = await client.post(
+        "/addToActivity",
+        { meeting_code: meetingcode },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-      return request.data;
+      return response?.data || null;
     } catch (error) {
       console.error("AddToHistory Error:", error.response?.data || error.message);
-      throw error;
+      return null;
     }
   };
 
@@ -95,6 +97,7 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
+  // ----------------- PROVIDER DATA -----------------
   const data = {
     userData,
     setUserData,
