@@ -12,17 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = connectToSocket(server);
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000", // local dev frontend
-      "https://real-time-video-conferencing-app-1.onrender.com", // deployed frontend
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
+app.use(cors());
 app.use(express.json({ limit: "40kb" }));
 app.use(express.urlencoded({ limit: "40kb", extended: true }));
 
@@ -39,9 +29,8 @@ const start = async () => {
         const connectionDb = await mongoose.connect(process.env.MONGO_URI);
         console.log(`✅ Database connected to ${connectionDb.connection.host}`);
 
-        const PORT = process.env.PORT || 8000;  // 👈 Use this
-        server.listen(PORT, () => {
-            console.log(`🚀 App is Listening on Port ${PORT}`);
+        server.listen(app.get("port"), () => {
+            console.log(`🚀 App is Listening on Port ${app.get("port")}`);
         });
     } catch (error) {
         console.error("❌ MongoDB connection error:", error);
