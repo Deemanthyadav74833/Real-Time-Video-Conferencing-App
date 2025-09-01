@@ -1,112 +1,95 @@
-import { createContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { createContext } from 'react';
+import { useContext } from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { StatusCodes } from "http-status-codes";
 
-// ----------------- CREATE CONTEXT -----------------
 export const AuthContext = createContext({});
 
-// ----------------- SETUP AXIOS CLIENT -----------------
 const client = axios.create({
-  baseURL:
-    window.location.hostname === "localhost"
-      ? "http://localhost:8000/api/v1/users"
-      : "https://real-time-video-conferencing-app-vd32.onrender.com/api/v1/users",
-});
+    baseURL: "http://localhost:8000/api/v1/users",
+})
 
-// ----------------- AUTH PROVIDER -----------------
+
+
 export const AuthProvider = ({ children }) => {
-  const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
 
-  // ----------------- REGISTER -----------------
-  const handleRegister = async (name, username, password) => {
-    try {
-      const response = await client.post("/register", {
-        name,
-        username,
-        password,
-      });
+    const [userData, setUserData] = useState(authContext);
 
-      if (response?.status === StatusCodes.CREATED) {
-        return response.data.message;
-      }
-    } catch (error) {
-      console.error("Register Error:", error.response?.data || error.message);
-      throw error;
-    }
-  };
+    const handleRegister = async (name,username,password) => {
+        try{
+            let request = await client.post('/register', {
+                name: name,
+                username: username,
+                password: password,
+            });
 
-  // ----------------- LOGIN -----------------
-  const handleLogin = async (username, password) => {
-    try {
-      const response = await client.post("/login", { username, password });
+            if(request.status === StatusCodes.CREATED){
+                return request.data.message;
+            }
 
-      if (response?.status === StatusCodes.OK && response?.data) {
-        localStorage.setItem("token", response.data.token);
-        setUserData(response.data.user);
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("Login Error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed");
-      throw error;
-    }
-  };
-
-  // ----------------- GET HISTORY -----------------
-  const getHistoryOfUser = async () => {
-    try {
-      const response = await client.get("/allactivity", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      return response?.data || [];
-    } catch (error) {
-      console.error("History Error:", error.response?.data || error.message);
-      return [];
-    }
-  };
-
-  // ----------------- ADD TO HISTORY -----------------
-  const addToUserHistory = async (meetingcode) => {
-    try {
-      const response = await client.post(
-        "/addToActivity",
-        { meeting_code: meetingcode },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+        } catch (error) {
+            throw error;
         }
-      );
-
-      return response?.data || null;
-    } catch (error) {
-      console.error("AddToHistory Error:", error.response?.data || error.message);
-      return null;
     }
-  };
 
-  // ----------------- LOGOUT -----------------
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUserData(null);
-    navigate("/login");
-  };
 
-  // ----------------- PROVIDER DATA -----------------
-  const data = {
-    userData,
-    setUserData,
-    handleRegister,
-    handleLogin,
-    getHistoryOfUser,
-    addToUserHistory,
-    handleLogout,
-  };
+    
+    const handleLogin = async (username, password) => {
+        try {
+            let request = await client.post("/login", {
+                username: username,
+                password: password
+            });
 
-  return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
-};
+            console.log(username, password)
+            console.log(request.data)
+
+            if (request.status === StatusCodes.OK) {
+                localStorage.setItem("token", request.data.token);
+            }
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    const getHistoryOfUser = async () => {
+        try {
+            let request = await client.get("/allactivity",{
+                params: {
+                    token: localStorage.getItem("token")
+                }
+
+            });
+            return request.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    const addToUserHistory = async (meetingcode) => {
+        try {
+            let request = await client.post("/addToActivity", {
+                token: localStorage.getItem("token"),
+                meeting_code: meetingcode
+            });
+
+            return request;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    const data = {
+        userData, setUserData, handleRegister, handleLogin, getHistoryOfUser,addToUserHistory
+    }
+
+    return(
+       <AuthContext.Provider value={data} >
+            {children}
+       </AuthContext.Provider>
+    )
+}
