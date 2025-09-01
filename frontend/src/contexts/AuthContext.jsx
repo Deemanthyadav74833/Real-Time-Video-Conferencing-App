@@ -8,9 +8,16 @@ import { StatusCodes } from "http-status-codes";
 
 export const AuthContext = createContext({});
 
+// AuthContext.jsx
+const BACKEND_URL =
+  window.location.hostname.includes("localhost")
+    ? "http://localhost:8000/api/v1/users"
+    : "https://real-time-video-conferencing-app-vd32.onrender.com/api/v1/users";
+
 const client = axios.create({
-    baseURL: "http://localhost:8000/api/v1/users",
-})
+  baseURL: BACKEND_URL,
+  withCredentials: true, // if you need cookies
+});
 
 
 
