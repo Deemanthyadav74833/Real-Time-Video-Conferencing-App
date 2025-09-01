@@ -29,8 +29,9 @@ const start = async () => {
         const connectionDb = await mongoose.connect(process.env.MONGO_URI);
         console.log(`✅ Database connected to ${connectionDb.connection.host}`);
 
-        server.listen(app.get("port"), () => {
-            console.log(`🚀 App is Listening on Port ${app.get("port")}`);
+        const PORT = process.env.PORT || 8000;  // 👈 Use this
+        server.listen(PORT, () => {
+            console.log(`🚀 App is Listening on Port ${PORT}`);
         });
     } catch (error) {
         console.error("❌ MongoDB connection error:", error);
