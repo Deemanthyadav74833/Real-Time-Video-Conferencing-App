@@ -12,9 +12,10 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import ChatIcon from '@mui/icons-material/Chat'
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import server from '../environment';
 
 
-const server_url = "http://localhost:8000"; //  a server that helps users find and connect to each other
+const server_url = server; //  a server that helps users find and connect to each other
 
 var connections = {}; // This is an object that stores WebRTC peer connections
 

@@ -5,11 +5,12 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { StatusCodes } from "http-status-codes";
+import server from '../environment';
 
 export const AuthContext = createContext({});
 
 const client = axios.create({
-    baseURL: "http://localhost:8000/api/v1/users",
+    baseURL: `${server}/api/v1/users`,
 })
 
 
