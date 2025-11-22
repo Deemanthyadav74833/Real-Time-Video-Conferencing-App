@@ -62,29 +62,29 @@ A full-stack real-time video conferencing application with WebRTC, Socket.io, an
 
 ## 📸 Screenshots
 - 🏠 Landing Page
-![LandingPage Screenshoot](./public/Screenshoots/Landing.png)
+![LandingPage Screenshoot](./Screenshoots/Landing.png)
 
 - 🔐 Authentication Page
-![AuthenticationPage Screenshoot](./public/Screenshoots/Auth.png)
+![AuthenticationPage Screenshoot](./Screenshoots/Auth.png)
 
 - 🏠 Home Dashboard
-![HomePage Screenshoot](./public/Screenshoots/Home.png)
+![HomePage Screenshoot](./Screenshoots/Home.png)
 
 - 🎪 Video Call Lobby
-![LobbyPage Screenshoot](./public/Screenshoots/Loby.png)
+![LobbyPage Screenshoot](./Screenshoots/Loby.png)
 
 - 📹 Video Call Interface
-![VideoCallPage Screenshoot](./public/Screenshoots/Videocall.png)
+![VideoCallPage Screenshoot](./Screenshoots/Videocall.png)
 
 - 💬 Chat During Call
-![ChattingPage Screenshoot](./public/Screenshoots/Chat.png)
+![ChattingPage Screenshoot](./Screenshoots/Chat.png)
 
 - 🖥️ Screen Sharing
-![ScreenSharePage Screenshoot](./public/Screenshoots/Screenshare.png)
+![ScreenSharePage Screenshoot](./Screenshoots/Screenshare.png)
 
 
 - 📊 Meeting History
-![MeetingHistoryPage Screenshoot](./public/Screenshoots/MeetingHistory.png)
+![MeetingHistoryPage Screenshoot](./Screenshoots/MeetingHistory.png)
 
 ## 📦 Installation & Setup
 **Prerequisites**
