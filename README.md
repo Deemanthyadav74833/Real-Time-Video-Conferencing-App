@@ -74,7 +74,7 @@ A full-stack real-time video conferencing application with WebRTC, Socket.io, an
 ![LobbyPage Screenshoot](./Screenshoots/Loby.png)
 
 - 📹 Video Call Interface
-![VideoCallPage Screenshoot](./Screenshoots/Videocall.png)
+![VideoCallPage Screenshoot](./Screenshoots/VideoCall.png)
 
 - 💬 Chat During Call
 ![ChattingPage Screenshoot](./Screenshoots/Chat.png)
